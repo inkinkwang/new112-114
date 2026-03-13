@@ -386,20 +386,26 @@
         .dept-btn {
             position: relative;
             overflow: hidden;
-            display: inline-block;
-            padding: 9px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc((100% - 72px) / 7);   /* 7個一排，6條12px間距 */
+            min-height: 42px;
+            padding: 8px 10px;
             border-radius: 22px;
             background: rgba(60, 60, 60, 0.70);
             border: 1px solid rgba(120,120,120,0.4);
             backdrop-filter: blur(6px);
             font-family: 'Noto Serif TC', serif;
-            font-size: clamp(12px, 1.3vw, 15px);
+            font-size: clamp(11px, 1.2vw, 14px);
             color: #eee;
             letter-spacing: 0.04em;
-            white-space: nowrap;
+            white-space: normal;        /* 允許換行，顯示完整名稱 */
+            word-break: break-word;
+            text-align: center;
             cursor: pointer;
             transition: background 0.2s, transform 0.15s;
-            text-align: center;
+            box-sizing: border-box;
         }
         .dept-btn::after {
             content: '';
@@ -446,14 +452,16 @@
         }
 
         #dept-back-btn {
-            margin-top: 14px;
-            padding: 7px 18px;
+            align-self: center;
+            margin-top: 20px;
+            margin-bottom: 32px;
+            padding: 9px 24px;
             border-radius: 20px;
             background: rgba(30, 80, 140, 0.85);
             border: 1px solid rgba(100, 180, 255, 0.5);
             color: #fff;
             font-family: 'Noto Serif TC', serif;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             transition: background 0.2s;
         }
@@ -531,18 +539,20 @@
             #subtitleBtn .btn-text { font-size: 16px !important; }
             .header-en { font-size: 14px; letter-spacing: 0.06em; }
             .header-zh { font-size: 12px; }
-            .support-email { bottom: -80px; font-size: 11px; }
+            .support-email { bottom: -80px; font-size: 10px; }
         }
 
         /* 客服信箱標示 */
         .support-email {
             position: absolute;
-            bottom: -150px; /* 距離主體下方向下移至約 150px */
+            bottom: -150px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 14px;
-            color: #888;
-            letter-spacing: 0.05em;
+            font-family: 'Noto Serif TC', serif;
+            font-size: clamp(13px, 1.5vw, 16px);
+            font-weight: 500;
+            color: #777;
+            letter-spacing: 0.1em;
             white-space: nowrap;
         }
     </style>
