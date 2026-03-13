@@ -539,7 +539,43 @@
             #subtitleBtn .btn-text { font-size: 16px !important; }
             .header-en { font-size: 14px; letter-spacing: 0.06em; }
             .header-zh { font-size: 12px; }
-            .support-email { bottom: -80px; font-size: 10px; }
+            .support-email { bottom: -80px; font-size: 6px; }
+
+            /* 手機版科系列表：自然換行、不店掌寬度 */
+            .dept-btn {
+                width: auto !important;
+                min-width: 0;
+                white-space: nowrap;
+                font-size: 12px;
+            }
+            #dept-list {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 8px;
+            }
+        }
+
+        /* 免費觀看範例按鈕：橘色主按鈕 */
+        #wrapperA > .shimmer-btn {
+            background: rgba(255, 140, 30, 0.72);
+            border-color: rgba(255, 180, 80, 0.85);
+            box-shadow:
+                0 0 18px 4px rgba(255,160,60,0.5),
+                0 0 40px 10px rgba(255,120,30,0.2),
+                0 4px 20px rgba(0,0,0,0.08);
+        }
+        #wrapperA > .shimmer-btn .btn-text {
+            color: #fff;
+            text-shadow: 0 1px 6px rgba(180,80,0,0.4);
+        }
+        #wrapperA > .shimmer-btn:hover {
+            background: rgba(220, 100, 10, 0.88);
+            box-shadow:
+                0 0 22px 6px rgba(255,140,40,0.6),
+                0 0 50px 12px rgba(255,100,20,0.3),
+                0 4px 20px rgba(0,0,0,0.2);
+            border-color: rgba(255,200,100,0.7);
         }
 
         /* 客服信箱標示 */
