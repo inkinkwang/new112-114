@@ -349,59 +349,85 @@
             #section-options {
                 /* 手機專屬 9:16 底圖 */
                 background-image: url('11-mobile.png');
-                /* 手機版先將背景圖對齊左下角，確保人物完整 */
-                background-position: left bottom;
-                /* 為了避免按鈕太靠上，維持上方距離 */
-                padding-top: 15vh;
+                background-position: center center;
+                padding-top: 10vh;
+                padding-left: 16px;
+                padding-right: 16px;
             }
 
             .option-wrapper {
                 position: static;
-                width: 100%;
+                width: auto;           /* 不強制撐滿，讓按鈕自然對齊 */
                 display: flex;
                 flex-direction: column;
-                align-items: center;
-                margin-bottom: 24px;
+                align-items: flex-start; /* 靠左對齊讓畫面不跳動 */
+                margin-bottom: 12px;
             }
             #wrapperA, #wrapperB, #wrapperC { transform: none; }
             
             .connection-line {
-                display: none; /* 手機版不適合直線 */
+                display: none;
+            }
+
+            /* ABC 主選項按鈕：大幅縮小 */
+            .option-btn {
+                padding: 8px 20px !important;
+            }
+            .option-btn .btn-text {
+                font-size: 13px !important;
+                letter-spacing: 0.1em;
             }
             
+            /* 學校子選單：縮小並橫向排列 */
             .sub-menu-dropdown {
                 position: static;
-                width: 100%;
+                width: 90vw;
                 right: auto;
-                justify-content: center;
-                padding-top: 16px;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-top: 8px;
                 transform: none;
-                transition: max-height 0.8s ease, opacity 0.6s ease;
+                transition: max-height 0.6s ease, opacity 0.5s ease;
+            }
+            .dark-option-btn {
+                padding: 6px 12px;
+                border-radius: 20px;
+            }
+            .dark-option-btn .btn-text-dark {
+                font-size: 11px !important;
+                letter-spacing: 0.05em;
             }
 
             /* 手機版：主按鈕移到影片下方 */
             .subtitle-overlay {
                 position: static;
                 transform: none;
-                margin-top: 30px;
+                margin-top: 24px;
                 opacity: 0;
+                visibility: hidden;
             }
             .subtitle-overlay.show {
                 opacity: 1;
+                visibility: visible;
             }
-            /* 手機版：稍微縮小影片和按鈕防破版 */
-            .shimmer-btn {
-                padding: 16px 40px;
+            /* 縮小第一頁的主按鈕 */
+            #subtitleBtn {
+                padding: 14px 36px;
             }
-            .btn-text {
-                font-size: 20px;
+            #subtitleBtn .btn-text {
+                font-size: 18px;
+            }
+            .header-en {
+                font-size: 15px;
+                letter-spacing: 0.08em;
             }
             .header-zh {
-                font-size: 16px;
+                font-size: 13px;
             }
-            /* 客服信箱稍微往上提一點，或因為按鈕下來了，距離要微調 */
             .support-email {
                 bottom: -80px;
+                font-size: 12px;
             }
         }
 
