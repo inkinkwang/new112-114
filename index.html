@@ -346,6 +346,15 @@
         }
 
         @media (max-width: 768px) {
+            #section-options {
+                /* 手機專屬 9:16 底圖 */
+                background-image: url('11-mobile.png');
+                /* 手機版先將背景圖對齊左下角，確保人物完整 */
+                background-position: left bottom;
+                /* 為了避免按鈕太靠上，維持上方距離 */
+                padding-top: 15vh;
+            }
+
             .option-wrapper {
                 position: static;
                 width: 100%;
