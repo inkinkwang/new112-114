@@ -361,43 +361,45 @@
 
         #dept-school-title {
             font-family: 'Noto Serif TC', serif;
-            font-size: clamp(18px, 2.5vw, 28px);
+            font-size: clamp(20px, 3vw, 32px);
             font-weight: 700;
             color: #444;
             letter-spacing: 0.15em;
-            margin-bottom: 16px;
-            padding: 10px 20px;
+            margin-bottom: 20px;
+            padding: 12px 24px;
             background: rgba(255,255,255,0.75);
             backdrop-filter: blur(8px);
             border-radius: 20px;
             border: 1px solid rgba(180,180,255,0.3);
+            width: 100%;
+            text-align: center;
         }
 
         #dept-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 12px;
             width: 100%;
         }
         
-        /* 淡灰色科系按鈕 */
+        /* 漸層半透明淡橘至米黃色科系按鈕 */
         .dept-btn {
             display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: rgba(220, 220, 230, 0.82);
-            border: 1px solid rgba(180,180,200,0.5);
+            padding: 9px 18px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(255, 195, 130, 0.82), rgba(255, 240, 200, 0.85));
+            border: 1px solid rgba(240, 180, 100, 0.5);
             backdrop-filter: blur(6px);
             font-family: 'Noto Serif TC', serif;
-            font-size: clamp(11px, 1.3vw, 15px);
-            color: #555;
+            font-size: clamp(13px, 1.5vw, 17px);
+            color: #5a3a00;
             letter-spacing: 0.05em;
             white-space: nowrap;
             cursor: pointer;
             transition: background 0.2s, transform 0.15s;
         }
         .dept-btn:hover {
-            background: rgba(200, 200, 220, 0.95);
+            background: linear-gradient(135deg, rgba(255, 170, 80, 0.95), rgba(255, 225, 160, 0.95));
             transform: scale(1.04);
         }
 
@@ -792,75 +794,7 @@
                 resetMenu();
             });
         });
-    </script>
-</body>
-</html>
 
-
-        // 因為影片已 muted 來確保 autoplay，保留這段以防萬一
-        document.body.addEventListener('click', () => {
-            if (video.paused) video.play();
-        }, { once: true });
-
-        // 影片結束 → 顯示字幕按鈕
-        video.addEventListener('ended', () => {
-            subtitle.classList.add('show');
-        });
-
-        // 點主按鈕 → 滑到第二區並顯示
-        subtitleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sectionOptions.classList.add('visible');
-            sectionOptions.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-
-        // 選項按鈕點擊邏輯 (子選單展開與隱藏其他)
-        const mainOptions = document.querySelectorAll('.main-option');
-        const wrappers = document.querySelectorAll('.option-wrapper');
-
-        mainOptions.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // 避免觸發 body 點擊
-                const targetId = btn.getAttribute('data-target');
-                const parentWrapper = document.getElementById(targetId);
-
-                // 如果已經是 active 狀態（表示已展開），則點擊時關閉自己，並讓其他選單回來
-                if (parentWrapper.classList.contains('active')) {
-                    parentWrapper.classList.remove('active');
-                    wrappers.forEach(w => w.classList.remove('hidden'));
-                } else {
-                    // 展開自己，隱藏其他
-                    wrappers.forEach(w => {
-                        if (w.id === targetId) {
-                            w.classList.remove('hidden');
-                            w.classList.add('active');
-                        } else {
-                            w.classList.remove('active');
-                            w.classList.add('hidden');
-                        }
-                    });
-                }
-            });
-        });
-
-        // 點擊背景空白處或專屬關閉按鈕，全部重置為初始狀態
-        const closeActions = document.querySelectorAll('.close-action');
-        
-        function resetMenu() {
-            wrappers.forEach(w => {
-                w.classList.remove('active');
-                w.classList.remove('hidden');
-            });
-        }
-
-        sectionOptions.addEventListener('click', resetMenu);
-        
-        closeActions.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // 阻止事件冒泡以免觸發背景點擊或其他動作
-                resetMenu();
-            });
-        });
     </script>
 </body>
 </html>
