@@ -51,6 +51,7 @@
             font-weight: 500;
             color: #777;
             letter-spacing: 0.1em;
+            line-height: 1.5; /* 增加行高讓斷行後比較好看 */
         }
 
         .video-container {
@@ -368,6 +369,31 @@
                 transform: none;
                 transition: max-height 0.8s ease, opacity 0.6s ease;
             }
+
+            /* 手機版：主按鈕移到影片下方 */
+            .subtitle-overlay {
+                position: static;
+                transform: none;
+                margin-top: 30px;
+                opacity: 0;
+            }
+            .subtitle-overlay.show {
+                opacity: 1;
+            }
+            /* 手機版：稍微縮小影片和按鈕防破版 */
+            .shimmer-btn {
+                padding: 16px 40px;
+            }
+            .btn-text {
+                font-size: 20px;
+            }
+            .header-zh {
+                font-size: 16px;
+            }
+            /* 客服信箱稍微往上提一點，或因為按鈕下來了，距離要微調 */
+            .support-email {
+                bottom: -80px;
+            }
         }
 
         /* 客服信箱標示 */
@@ -390,10 +416,10 @@
         <!-- 頂部標題 -->
         <div class="header-title-container">
             <div class="header-en">Historical Probability Insights</div>
-            <div class="header-zh">申請入學第二階段 112-114歷史錄取狀況/機率</div>
+            <div class="header-zh">申請入學第二階段<br>112-114歷史錄取狀況/機率</div>
         </div>
 
-        <div style="position:relative; display:inline-block;">
+        <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
             <div class="video-container">
                 <!-- 加上 muted 即可保證網頁一打開就自動播放 -->
                 <video id="mainVideo" autoplay muted playsinline preload="auto">
@@ -402,6 +428,7 @@
                 </video>
             </div>
 
+            <!-- 主按鈕：在桌機版會用 absolute 疊加，手機版會變成 static 往下排 -->
             <div class="subtitle-overlay" id="subtitle">
                 <div class="shimmer-btn" id="subtitleBtn">
                     <span class="btn-text">打開歷史，掌握未來</span>
