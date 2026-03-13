@@ -24,7 +24,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px 20px 60px; /* 下方留多一點空間 */
+            padding: 20px 20px 160px; /* 下方留更多空間給客服信箱 */
             position: relative;
         }
 
@@ -79,13 +79,15 @@
             transform: translateX(-50%) translateY(50%);
             text-align: center;
             opacity: 0;
-            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            visibility: hidden; /* 確保隱藏時不會有任何渲染問題 */
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.5s;
             pointer-events: none;
             z-index: 10;
             white-space: nowrap;
         }
         .subtitle-overlay.show {
             opacity: 1;
+            visibility: visible;
             pointer-events: auto;
         }
 
@@ -98,8 +100,12 @@
             cursor: pointer;
             overflow: hidden;
             background: rgba(255, 255, 255, 0.7);
+            
+            /* 將濾鏡加在這裡，但在透明度為 0 時某些瀏覽器會有鈍感 
+               解決方法：給主容器加上 will-change: opacity */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            
             box-shadow:
                 0 0 18px 4px rgba(255,255,255,0.7),
                 0 0 40px 10px rgba(200,200,255,0.3),
@@ -107,6 +113,7 @@
             border: 1.5px solid rgba(255,255,255,0.85);
             transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.15s;
             text-decoration: none;
+            will-change: transform;
         }
 
         /* 掃光效果實體（預設不執行動畫） */
@@ -362,6 +369,18 @@
                 transition: max-height 0.8s ease, opacity 0.6s ease;
             }
         }
+
+        /* 客服信箱標示 */
+        .support-email {
+            position: absolute;
+            bottom: -150px; /* 距離主體下方向下移至約 150px */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -376,7 +395,8 @@
 
         <div style="position:relative; display:inline-block;">
             <div class="video-container">
-                <video id="mainVideo" autoplay playsinline preload="auto">
+                <!-- 加上 muted 即可保證網頁一打開就自動播放 -->
+                <video id="mainVideo" autoplay muted playsinline preload="auto">
                     <source src="我的影片.mp4" type="video/mp4">
                     您的瀏覽器不支援影片播放。
                 </video>
@@ -387,6 +407,9 @@
                     <span class="btn-text">打開歷史，掌握未來</span>
                 </div>
             </div>
+
+            <!-- 客服信箱標示於此容器底部的下方 -->
+            <div class="support-email">客服信箱：inkink730424@gmail.com</div>
         </div>
     </section>
 
@@ -460,7 +483,7 @@
         const subtitleBtn = document.getElementById('subtitleBtn');
         const sectionOptions = document.getElementById('section-options');
 
-        // 有聲音 autoplay 被擋時，點任一處恢復
+        // 因為影片已 muted 來確保 autoplay，保留這段以防萬一
         document.body.addEventListener('click', () => {
             if (video.paused) video.play();
         }, { once: true });
