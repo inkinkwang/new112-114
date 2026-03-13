@@ -347,63 +347,65 @@
 
         @media (max-width: 768px) {
             #section-options {
-                /* 手機專屬 9:16 底圖 */
                 background-image: url('11-mobile.png');
+                background-size: cover;
                 background-position: center center;
-                padding-top: 10vh;
-                padding-left: 16px;
-                padding-right: 16px;
+                padding: 8vh 12px 20px;
+                overflow-y: auto; /* 避免內容溢出 */
             }
 
             .option-wrapper {
                 position: static;
-                width: auto;           /* 不強制撐滿，讓按鈕自然對齊 */
+                width: auto;
                 display: flex;
                 flex-direction: column;
-                align-items: flex-start; /* 靠左對齊讓畫面不跳動 */
-                margin-bottom: 12px;
+                align-items: flex-start;
+                margin-bottom: 8px;
             }
             #wrapperA, #wrapperB, #wrapperC { transform: none; }
             
-            .connection-line {
-                display: none;
-            }
+            .connection-line { display: none; }
 
-            /* ABC 主選項按鈕：大幅縮小 */
+            /* ABC 主選項按鈕 */
             .option-btn {
-                padding: 8px 20px !important;
+                padding: 5px 14px !important;
+                border-radius: 30px !important;
             }
-            .option-btn .btn-text {
-                font-size: 13px !important;
-                letter-spacing: 0.1em;
+            .option-btn .btn-text,
+            .option-btn .btn-text * {
+                font-size: 10px !important;
+                letter-spacing: 0.08em !important;
+                line-height: 1.3 !important;
             }
             
-            /* 學校子選單：縮小並橫向排列 */
+            /* 學校子選單 */
             .sub-menu-dropdown {
                 position: static;
-                width: 90vw;
+                width: 92vw;
                 right: auto;
+                display: flex;
                 justify-content: flex-start;
                 flex-wrap: wrap;
-                gap: 6px;
-                padding-top: 8px;
+                gap: 4px;
+                padding-top: 6px;
                 transform: none;
                 transition: max-height 0.6s ease, opacity 0.5s ease;
             }
             .dark-option-btn {
-                padding: 6px 12px;
-                border-radius: 20px;
+                padding: 4px 8px !important;
+                border-radius: 14px !important;
             }
             .dark-option-btn .btn-text-dark {
-                font-size: 11px !important;
-                letter-spacing: 0.05em;
+                font-size: 9px !important;
+                letter-spacing: 0.03em !important;
+                white-space: nowrap;
             }
 
-            /* 手機版：主按鈕移到影片下方 */
+            /* 主按鈕移到影片下方 */
             .subtitle-overlay {
                 position: static;
                 transform: none;
-                margin-top: 24px;
+                margin-top: 20px;
                 opacity: 0;
                 visibility: hidden;
             }
@@ -411,24 +413,11 @@
                 opacity: 1;
                 visibility: visible;
             }
-            /* 縮小第一頁的主按鈕 */
-            #subtitleBtn {
-                padding: 14px 36px;
-            }
-            #subtitleBtn .btn-text {
-                font-size: 18px;
-            }
-            .header-en {
-                font-size: 15px;
-                letter-spacing: 0.08em;
-            }
-            .header-zh {
-                font-size: 13px;
-            }
-            .support-email {
-                bottom: -80px;
-                font-size: 12px;
-            }
+            #subtitleBtn { padding: 12px 28px; }
+            #subtitleBtn .btn-text { font-size: 16px !important; }
+            .header-en { font-size: 14px; letter-spacing: 0.06em; }
+            .header-zh { font-size: 12px; }
+            .support-email { bottom: -80px; font-size: 11px; }
         }
 
         /* 客服信箱標示 */
