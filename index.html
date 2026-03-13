@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>影片播放</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: #ffffff;
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'Microsoft JhengHei', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ===== 第一區：影片 ===== */
+        #section-video {
+            display: flex;
+            flex-direction: column; /* 改為垂直排列讓文字在上方 */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 20px 60px; /* 下方留多一點空間 */
+            position: relative;
+        }
+
+        /* 頂部標題文字設定 */
+        .header-title-container {
+            text-align: center;
+            margin-bottom: 24px; /* 與影片的距離 */
+            z-index: 5;
+        }
+        
+        .header-en {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: clamp(20px, 2.5vw, 32px);
+            font-weight: 700; /* 加粗 */
+            color: #555;
+            letter-spacing: 0.15em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        
+        .header-zh {
+            font-family: 'Noto Serif TC', serif;
+            font-size: clamp(18px, 2vw, 24px);
+            font-weight: 500;
+            color: #777;
+            letter-spacing: 0.1em;
+        }
+
+        .video-container {
+            position: relative;
+            display: inline-block;
+            line-height: 0;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12), 0 5px 15px rgba(0,0,0,0.06);
+        }
+
+        video {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: calc(100vw - 40px);
+            max-height: 88vh;
+            border-radius: 40px;
+        }
+
+        /* 字幕按鈕定位 */
+        .subtitle-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .subtitle-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ===== 共用 Shimmer 按鈕 ===== */
+        .shimmer-btn {
+            position: relative;
+            display: inline-block;
+            padding: 22px 64px;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow:
+                0 0 18px 4px rgba(255,255,255,0.7),
+                0 0 40px 10px rgba(200,200,255,0.3),
+                0 4px 20px rgba(0,0,0,0.08);
+            border: 1.5px solid rgba(255,255,255,0.85);
+            transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.15s;
+            text-decoration: none;
+        }
+
+        /* 掃光效果實體（預設不執行動畫） */
+        .shimmer-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -120%;
+            width: 80%; height: 100%;
+            background: linear-gradient(120deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.7) 50%,
+                rgba(255,255,255,0) 100%);
+            transform: skewX(-20deg);
+            pointer-events: none;
+            transition: left 0s; /* 重置動畫狀態 */
+        }
+        
+        /* 當滑鼠移過去時，馬上從左到右掃過一次 */
+        .shimmer-btn:hover::before {
+            animation: hover-shimmer 0.8s ease-out forwards;
+        }
+
+        @keyframes hover-shimmer {
+            0%   { left: -120%; }
+            100% { left: 130%; }
+        }
+
+        /* ===== Hover / Active（主按鈕 & 所有選項按鈕統一效果）===== */
+        .shimmer-btn:hover {
+            background: rgba(30, 20, 50, 0.82);
+            box-shadow:
+                0 0 22px 6px rgba(150,100,255,0.5),
+                0 0 50px 12px rgba(100,80,200,0.25),
+                0 4px 20px rgba(0,0,0,0.2);
+            border-color: rgba(180,150,255,0.6);
+            transform: scale(1.05);
+        }
+        .shimmer-btn:hover .btn-text {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(200,180,255,0.7);
+        }
+        .shimmer-btn:active {
+            transform: scale(0.97);
+            background: rgba(10,5,30,0.9);
+            box-shadow: 0 0 12px 3px rgba(120,80,255,0.6), 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* 按鈕文字 */
+        .btn-text {
+            font-family: 'Noto Serif TC', serif;
+            font-size: clamp(22px, 3vw, 38px);
+            font-weight: 500;
+            color: #555; /* 改為與標題相同的深灰色 */
+            letter-spacing: 0.25em;
+            margin-right: -0.25em;
+            line-height: 1.5;
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        /* 選項按鈕放大 1.2 倍 */
+        .option-btn { padding: 22px 62px; } /* padding 放大 1.2 倍 (原 18px 52px) */
+        .option-btn .btn-text { font-size: clamp(22px, 2.6vw, 36px); } /* 字體放大 1.2 倍 (原 18px 30px) */
+
+        /* ===== 第二區：選項 ===== */
+        #section-options {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            background-image: url('11.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            pointer-events: none;
+        }
+        #section-options.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ===== 子選單：線條與下拉選單 ===== */
+        .option-wrapper {
+            position: absolute;
+            z-index: 2;
+        }
+
+        /* 將原本的按鈕絕對定位移交給各 wrapper */
+        #wrapperA { top: 10%; right: 15%; }
+        #wrapperB { top: 22.5%; right: 27.5%; }
+        #wrapperC { top: 35%; right: 40%; }
+
+        .main-option {
+            position: relative;
+            z-index: 10; /* 主按鈕層級最高，疊在線上 */
+        }
+
+        /* 隱藏未選取的按鈕：透過延遲 (transition-delay)，讓收合動畫跑完才浮現 */
+        .option-wrapper.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+            /* 當加入 hidden 類別時馬上消失 (0s delay)，但移除 hidden 類別（復原）時延遲 0.6s */
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        
+        /* 當 option-wrapper 沒有 hidden 類別時（復原出現的過程），給予延遲 */
+        .option-wrapper:not(.hidden):not(.active) {
+            transition: opacity 0.5s ease 0.6s, transform 0.5s ease 0.6s;
+        }
+
+        /* 延伸出來的發光線條 */
+        .connection-line {
+            position: absolute;
+            top: 50%;
+            right: 100%; /* 從主按鈕左邊往左邊長 */
+            height: 2px;
+            width: 0; /* 預設收合 */
+            background: rgba(200, 180, 255, 0.8);
+            box-shadow: 0 0 10px 2px rgba(150, 100, 255, 0.4);
+            transform: translateY(-50%);
+            /* 收合時線條動畫不需要 delay，或是給很短的 delay */
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* 展開狀態下線條長度 (原本 35vw，縮減 1/5 = 28vw) */
+        .option-wrapper.active .connection-line {
+            width: 28vw; 
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 點選後的子選單(向下展開) */
+        .sub-menu-dropdown {
+            position: absolute;
+            top: 50%; /* 對齊線條 */
+            right: 0; /* 對齊線的終點/起點一帶，我們將用 padding/margin 推移 */
+            /* 以 right: 100% 就可以貼齊主按鈕的左側，向左下展開 */
+            right: calc(100% + 20px); 
+            padding-top: 30px; /* 創造出距離線條下方的空間 */
+            
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: flex-end; /* 靠右(靠近發光線右端)靠齊 */
+            gap: 12px;
+            width: 28vw; /* 跟線條等寬 */
+            max-width: 500px;
+            
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-20px);
+            
+            /* 收合時的動畫 (無延遲) */
+            transition: 
+                max-height 0.4s ease, 
+                opacity 0.3s ease, 
+                transform 0.3s ease;
+            z-index: 6;
+        }
+
+        /* 展開時的動畫 (加入延遲讓線先跑) */
+        .option-wrapper.active .sub-menu-dropdown {
+            max-height: 800px;
+            opacity: 1;
+            transform: translateY(0);
+            overflow: visible;
+            transition: 
+                max-height 0.6s ease 0.3s, 
+                opacity 0.6s ease 0.3s, 
+                transform 0.6s ease 0.3s;
+        }
+
+        /* 深色子按鈕樣式 */
+        .dark-option-btn {
+            position: relative;
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            overflow: hidden;
+            background: rgba(40, 30, 60, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border: 1px solid rgba(150, 130, 200, 0.4);
+            transition: background 0.3s, transform 0.15s, box-shadow 0.3s, border-color 0.3s;
+            text-decoration: none;
+        }
+
+        .dark-option-btn:hover {
+            background: rgba(60, 40, 90, 0.95);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px 4px rgba(120,80,255,0.4);
+            border-color: rgba(180,150,255,0.6);
+        }
+        
+        .dark-option-btn:active {
+            transform: scale(0.95);
+        }
+
+        .dark-option-btn .btn-text-dark {
+            font-family: 'Noto Serif TC', serif;
+            font-size: clamp(15px, 1.6vw, 20px);
+            font-weight: 400;
+            color: #f0f0f0;
+            letter-spacing: 0.15em;
+            margin-right: -0.15em;
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 專屬藍色的「收合返回」按鈕 */
+        .close-btn {
+            background: rgba(30, 80, 140, 0.85);
+            border-color: rgba(100, 180, 255, 0.5);
+        }
+        .close-btn:hover {
+            background: rgba(40, 100, 180, 0.95);
+            box-shadow: 0 0 15px 4px rgba(80,180,255,0.4);
+            border-color: rgba(120,200,255,0.8);
+        }
+
+        @media (max-width: 768px) {
+            .option-wrapper {
+                position: static;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 24px;
+            }
+            #wrapperA, #wrapperB, #wrapperC { transform: none; }
+            
+            .connection-line {
+                display: none; /* 手機版不適合直線 */
+            }
+            
+            .sub-menu-dropdown {
+                position: static;
+                width: 100%;
+                right: auto;
+                justify-content: center;
+                padding-top: 16px;
+                transform: none;
+                transition: max-height 0.8s ease, opacity 0.6s ease;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 第一區：影片 -->
+    <section id="section-video">
+        <!-- 頂部標題 -->
+        <div class="header-title-container">
+            <div class="header-en">Historical Probability Insights</div>
+            <div class="header-zh">申請入學第二階段 112-114歷史錄取狀況/機率</div>
+        </div>
+
+        <div style="position:relative; display:inline-block;">
+            <div class="video-container">
+                <video id="mainVideo" autoplay playsinline preload="auto">
+                    <source src="我的影片.mp4" type="video/mp4">
+                    您的瀏覽器不支援影片播放。
+                </video>
+            </div>
+
+            <div class="subtitle-overlay" id="subtitle">
+                <div class="shimmer-btn" id="subtitleBtn">
+                    <span class="btn-text">打開歷史，掌握未來</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 第二區：選項（點擊主按鈕後顯示） -->
+    <section id="section-options">
+        
+        <!-- 選項 A 模組 -->
+        <div class="option-wrapper" id="wrapperA">
+            <div class="shimmer-btn option-btn main-option" data-target="wrapperA">
+                <span class="btn-text">免費觀看範例</span>
+            </div>
+            <!-- 動態線與往下的下拉選單 -->
+            <div class="connection-line"></div>
+            <div class="sub-menu-dropdown">
+                <div class="dark-option-btn"><span class="btn-text-dark">國立臺灣大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立政治大學</span></div>
+                <div class="dark-option-btn close-btn close-action"><span class="btn-text-dark">收合返回</span></div>
+            </div>
+        </div>
+
+        <!-- 選項 B 模組 -->
+        <div class="option-wrapper" id="wrapperB">
+            <div class="shimmer-btn option-btn main-option" data-target="wrapperB">
+                <span class="btn-text">探索國立大學</span>
+            </div>
+            <!-- 動態線與往下的下拉選單 -->
+            <div class="connection-line"></div>
+            <div class="sub-menu-dropdown">
+                <div class="dark-option-btn"><span class="btn-text-dark">國立臺灣大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立臺灣海洋大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立台灣師範大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立台北教育大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立中興大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立中央大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立中山大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立聯合大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立陽明交通大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立高雄師範大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立政治大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立屏東大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立宜蘭大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">國立東華大學</span></div>
+                <div class="dark-option-btn close-btn close-action"><span class="btn-text-dark">收合返回</span></div>
+            </div>
+        </div>
+
+        <!-- 選項 C 模組 -->
+        <div class="option-wrapper" id="wrapperC">
+            <div class="shimmer-btn option-btn main-option" data-target="wrapperC">
+                <span class="btn-text">探索私立大學</span>
+            </div>
+            <!-- 動態線與往下的下拉選單 -->
+            <div class="connection-line"></div>
+            <div class="sub-menu-dropdown">
+                <div class="dark-option-btn"><span class="btn-text-dark">逢甲大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">中原大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">東海大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">世新大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">元智大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">中山醫藥大學</span></div>
+                <div class="dark-option-btn"><span class="btn-text-dark">長庚大學</span></div>
+                <div class="dark-option-btn close-btn close-action"><span class="btn-text-dark">收合返回</span></div>
+            </div>
+        </div>
+
+    </section>
+
+    <script>
+        const video       = document.getElementById('mainVideo');
+        const subtitle    = document.getElementById('subtitle');
+        const subtitleBtn = document.getElementById('subtitleBtn');
+        const sectionOptions = document.getElementById('section-options');
+
+        // 有聲音 autoplay 被擋時，點任一處恢復
+        document.body.addEventListener('click', () => {
+            if (video.paused) video.play();
+        }, { once: true });
+
+        // 影片結束 → 顯示字幕按鈕
+        video.addEventListener('ended', () => {
+            subtitle.classList.add('show');
+        });
+
+        // 點主按鈕 → 滑到第二區並顯示
+        subtitleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sectionOptions.classList.add('visible');
+            sectionOptions.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        // 選項按鈕點擊邏輯 (子選單展開與隱藏其他)
+        const mainOptions = document.querySelectorAll('.main-option');
+        const wrappers = document.querySelectorAll('.option-wrapper');
+
+        mainOptions.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 避免觸發 body 點擊
+                const targetId = btn.getAttribute('data-target');
+                const parentWrapper = document.getElementById(targetId);
+
+                // 如果已經是 active 狀態（表示已展開），則點擊時關閉自己，並讓其他選單回來
+                if (parentWrapper.classList.contains('active')) {
+                    parentWrapper.classList.remove('active');
+                    wrappers.forEach(w => w.classList.remove('hidden'));
+                } else {
+                    // 展開自己，隱藏其他
+                    wrappers.forEach(w => {
+                        if (w.id === targetId) {
+                            w.classList.remove('hidden');
+                            w.classList.add('active');
+                        } else {
+                            w.classList.remove('active');
+                            w.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+        });
+
+        // 點擊背景空白處或專屬關閉按鈕，全部重置為初始狀態
+        const closeActions = document.querySelectorAll('.close-action');
+        
+        function resetMenu() {
+            wrappers.forEach(w => {
+                w.classList.remove('active');
+                w.classList.remove('hidden');
+            });
+        }
+
+        sectionOptions.addEventListener('click', resetMenu);
+        
+        closeActions.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 阻止事件冒泡以免觸發背景點擊或其他動作
+                resetMenu();
+            });
+        });
+    </script>
+</body>
+</html>
