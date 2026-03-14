@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>影片播放</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -596,14 +597,15 @@
                 padding-bottom: 8px;
             }
 
-            /* 手機版資料畫面縮小70% (維持原樣) */
-            #dept-modal.active .dept-modal-content {
-                transform: translateY(0) scale(0.7) !important;
-            }
-            /* 服務規範與付款提醒視窗再縮小20% (0.7 * 0.8 = 0.56) */
+            /* 手機版彈出視窗：恢復原本大小，自動符合視窗 */
+            #dept-modal.active .dept-modal-content,
             #service-terms-modal.active .terms-modal-content,
             #payment-warning-modal.active .warning-modal-content {
-                transform: translateY(0) scale(0.56) !important;
+                transform: translateY(0) scale(1) !important;
+                max-height: 85vh;
+                overflow-y: auto;
+                margin: 20px;
+                width: calc(100% - 40px);
             }
         }
 
