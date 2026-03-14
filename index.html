@@ -886,10 +886,108 @@
             transition: all 0.2s;
             text-decoration: none;
         }
-        .btn-confirm-pay:hover {
+        .btn-confirm-pay:hover:not(.disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255,170,0,0.6);
             background: linear-gradient(135deg, #ffb833, #f39c12);
+        }
+        .btn-confirm-pay.disabled {
+            background: rgba(120, 120, 120, 0.5);
+            color: #999;
+            cursor: not-allowed;
+            box-shadow: none;
+            pointer-events: none;
+        }
+
+        .warning-checkbox-wrapper {
+            margin-bottom: 20px;
+            font-size: 15px;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .warning-checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #ffaa00;
+        }
+        .warning-checkbox-wrapper span {
+            user-select: none;
+        }
+
+        /* ===== 服務規範 Modal ===== */
+        #service-terms-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+        #service-terms-modal.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .terms-modal-content {
+            background: rgba(30, 40, 50, 0.95);
+            border: 1px solid rgba(100, 200, 255, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 30px rgba(0, 150, 255, 0.2);
+            font-family: 'Noto Serif TC', serif;
+            color: #eee;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        #service-terms-modal.active .terms-modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .terms-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #b3e0ff;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 0.1em;
+            border-bottom: 1px dashed rgba(100, 200, 255, 0.3);
+            padding-bottom: 15px;
+        }
+        .terms-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .terms-list-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+        .terms-label {
+            color: #66b3ff;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .terms-buttons {
+            display: flex;
+            justify-content: center;
         }
     </style>
 </head>
@@ -1024,9 +1122,35 @@
                 <div style="font-size: 12px; color: #888; margin-top: 8px;">示意圖：請在此欄位貼上科系資料</div>
             </div>
 
+            <label class="warning-checkbox-wrapper">
+                <input type="checkbox" id="terms-agree-checkbox">
+                <span>已閱讀「付費服務與規範說明」</span>
+            </label>
+
             <div class="warning-buttons">
                 <button class="btn-cancel" id="warning-cancel-btn">返回</button>
-                <a href="https://core.newebpay.com/EPG/MS1817051362/qlKaeo" target="_blank" class="btn-confirm-pay" id="warning-confirm-btn">我已複製，前往結帳</a>
+                <a href="https://core.newebpay.com/EPG/MS1817051362/qlKaeo" target="_blank" class="btn-confirm-pay disabled" id="warning-confirm-btn">我已複製，前往結帳</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 服務規範 Modal -->
+    <div id="service-terms-modal">
+        <div class="terms-modal-content">
+            <button class="modal-close-btn" id="terms-close-btn" style="top: 15px; right: 15px;">&times;</button>
+            <div class="terms-title">付費服務與規範說明</div>
+            
+            <div class="terms-list">
+                <div class="terms-list-item"><span class="terms-label">服務費用：</span>『1個科系』 NT$ 100</div>
+                <div class="terms-list-item"><span class="terms-label">取得時間：</span>完成付費後，24小時內將數據發送至email</div>
+                <div class="terms-list-item"><span class="terms-label">名額限制：</span>暫定500個名額，視情況調整或關閉。</div>
+                <div class="terms-list-item"><span class="terms-label">法律聲明：</span>報告資料來源合法，過往歷史數據僅供參考，非錄取與推薦保證。</div>
+                <div class="terms-list-item"><span class="terms-label">退費相關：</span>非本系統顯示之校系，請勿送件，誤送件的退費案件會扣除 NT$20 時間處理費。如為我方無法提供數據服務之科系，將主動通知全額退費或更換校系。</div>
+                <div class="terms-list-item"><span class="terms-label">權益聲明：</span>本服務屬「依消費者要求所為之客製化給付」，不適用 7 天鑑賞期，我方保留拒絕服務、退款及對服務內容之最終解釋權，數據內容也請勿外流。</div>
+            </div>
+
+            <div class="terms-buttons">
+                <button class="btn-cancel" id="terms-confirm-ok-btn" style="width: 100%;">我已了解</button>
             </div>
         </div>
     </div>
@@ -1303,13 +1427,26 @@
         const warningCancelBtn = document.getElementById('warning-cancel-btn');
         const warningConfirmBtn = document.getElementById('warning-confirm-btn');
         const warningCopyText = document.getElementById('warning-copy-text');
+        const termsAgreeCheckbox = document.getElementById('terms-agree-checkbox');
 
         premiumQueryBtn.addEventListener('click', (e) => {
             e.preventDefault(); // 阻止原本直接觸發跳轉的 a href 行為
             // 更新要複製的文字內容
             warningCopyText.textContent = `${currentDeptNameStr} + 代碼${currentDeptCodeStr}`;
+            // 每次打開前重設勾選框與按鈕狀態
+            termsAgreeCheckbox.checked = false;
+            warningConfirmBtn.classList.add('disabled');
             // 顯示警告彈窗
             warningModal.classList.add('active');
+        });
+
+        // 監聽勾選框變化，切換按鈕狀態
+        termsAgreeCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                warningConfirmBtn.classList.remove('disabled');
+            } else {
+                warningConfirmBtn.classList.add('disabled');
+            }
         });
 
         warningCancelBtn.addEventListener('click', () => {
@@ -1322,9 +1459,38 @@
             }
         });
         
-        // 點擊前往結帳後，關閉警告視窗
-        warningConfirmBtn.addEventListener('click', () => {
+        // 點擊前往結帳後，如果處於 disabled 狀態則阻擋跳轉 (以防萬一)，否則過關並關閉視窗
+        warningConfirmBtn.addEventListener('click', (e) => {
+            if (warningConfirmBtn.classList.contains('disabled')) {
+                e.preventDefault();
+                alert('請先勾選已閱讀「付費服務與規範說明」');
+                return;
+            }
             warningModal.classList.remove('active');
+        });
+
+        // ===== 服務規範邏輯 =====
+        const termsModal = document.getElementById('service-terms-modal');
+        const premiumTermsBtn = document.getElementById('premium-terms-btn');
+        const termsCloseBtn = document.getElementById('terms-close-btn');
+        const termsConfirmOkBtn = document.getElementById('terms-confirm-ok-btn');
+
+        premiumTermsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            termsModal.classList.add('active');
+        });
+
+        function closeTermsModal() {
+            termsModal.classList.remove('active');
+        }
+
+        termsCloseBtn.addEventListener('click', closeTermsModal);
+        termsConfirmOkBtn.addEventListener('click', closeTermsModal);
+        
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) {
+                closeTermsModal();
+            }
         });
 
     </script>
