@@ -213,8 +213,8 @@
         }
 
         /* 將原本的按鈕絕對定位移交給各 wrapper */
-        #wrapperB { top: 20%; right: 25%; }
-        #wrapperC { top: 35%; right: 35%; }
+        #wrapperB { top: 15%; right: 25%; }
+        #wrapperC { top: 40%; right: 35%; }
 
         .main-option {
             position: relative;
@@ -788,6 +788,109 @@
             20% { left: 200%; }
             100% { left: 200%; }
         }
+
+        /* ===== 付款提醒 Modal ===== */
+        #payment-warning-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10000; /* 比前面的科系 modal 還高 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+        #payment-warning-modal.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .warning-modal-content {
+            background: rgba(40, 30, 45, 0.95);
+            border: 2px solid rgba(255, 170, 0, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 30px rgba(255,170,0,0.3);
+            text-align: center;
+            font-family: 'Noto Serif TC', serif;
+            color: #eee;
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #payment-warning-modal.active .warning-modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .warning-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffaa00;
+            margin-bottom: 20px;
+            letter-spacing: 0.1em;
+        }
+        .warning-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .warning-highlight {
+            color: #fff;
+            background: rgba(255, 170, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 18px;
+            letter-spacing: 0.05em;
+        }
+        .warning-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn-cancel {
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: #ccc;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Noto Serif TC', serif;
+            transition: all 0.2s;
+        }
+        .btn-cancel:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .btn-confirm-pay {
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffaa00, #e67e22);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Noto Serif TC', serif;
+            box-shadow: 0 4px 15px rgba(255,170,0,0.4);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-confirm-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,170,0,0.6);
+            background: linear-gradient(135deg, #ffb833, #f39c12);
+        }
     </style>
 </head>
 <body>
@@ -899,6 +1002,31 @@
                 <a href="#" class="btn-premium btn-premium-cyan" id="premium-terms-btn">
                     付費服務與規範說明
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 付款提醒 Modal -->
+    <div id="payment-warning-modal">
+        <div class="warning-modal-content">
+            <div class="warning-title">⚠️ 付款前重要提醒</div>
+            <div class="warning-text">
+                請在藍新結帳畫面的最下方找到<span style="color: #ffaa00; font-weight: bold;">「留言給商店」</span>欄位，並<strong style="color: #ff4444;">務必準確填寫</strong>您想查詢的科系名稱與專屬代碼，以便系統能夠為您核發正確的報表資料。
+                <br>
+                <div style="text-align: center; margin-top: 15px;">
+                    請複製並貼上以下資訊：<br>
+                    <span class="warning-highlight" id="warning-copy-text" style="user-select: all; cursor: copy;" title="點擊即可選取複製">-</span>
+                </div>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+                <img src="https://i.imgur.com/gTrQ6Jp.png" alt="留言給商店示意圖" style="width: 100%; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
+                <div style="font-size: 12px; color: #888; margin-top: 8px;">示意圖：請在此欄位貼上科系資料</div>
+            </div>
+
+            <div class="warning-buttons">
+                <button class="btn-cancel" id="warning-cancel-btn">返回</button>
+                <a href="https://core.newebpay.com/EPG/MS1817051362/qlKaeo" target="_blank" class="btn-confirm-pay" id="warning-confirm-btn">我已複製，前往結帳</a>
             </div>
         </div>
     </div>
@@ -1134,8 +1262,12 @@
         // ===== Modal Logic =====
         const modal = document.getElementById('dept-modal');
         const modalCloseBtnInner = document.getElementById('modal-close-btn');
+        let currentDeptCodeStr = '';
+        let currentDeptNameStr = '';
 
         function showDeptModal(code, name) {
+            currentDeptCodeStr = code;
+            currentDeptNameStr = name;
             document.getElementById('modal-dept-name').textContent = name;
             
             const data = deptDataCache.get(code) || {
@@ -1163,6 +1295,36 @@
             if (e.target === modal) {
                 closeDeptModal();
             }
+        });
+
+        // ===== 付款提醒邏輯 =====
+        const premiumQueryBtn = document.getElementById('premium-query-btn');
+        const warningModal = document.getElementById('payment-warning-modal');
+        const warningCancelBtn = document.getElementById('warning-cancel-btn');
+        const warningConfirmBtn = document.getElementById('warning-confirm-btn');
+        const warningCopyText = document.getElementById('warning-copy-text');
+
+        premiumQueryBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // 阻止原本直接觸發跳轉的 a href 行為
+            // 更新要複製的文字內容
+            warningCopyText.textContent = `${currentDeptNameStr} + 代碼${currentDeptCodeStr}`;
+            // 顯示警告彈窗
+            warningModal.classList.add('active');
+        });
+
+        warningCancelBtn.addEventListener('click', () => {
+            warningModal.classList.remove('active');
+        });
+
+        warningModal.addEventListener('click', (e) => {
+            if (e.target === warningModal) {
+                warningModal.classList.remove('active');
+            }
+        });
+        
+        // 點擊前往結帳後，關閉警告視窗
+        warningConfirmBtn.addEventListener('click', () => {
+            warningModal.classList.remove('active');
         });
 
     </script>
