@@ -599,10 +599,6 @@
             #dept-modal.active .dept-modal-content {
                 transform: translateY(0) scale(0.7) !important;
             }
-
-            /* 手機版付費按鈕文字分三行 */
-            .premium-desktop-text { display: none !important; }
-            .premium-mobile-text { display: block !important; margin-top: 4px; line-height: 1.5; }
         }
 
 
@@ -736,14 +732,14 @@
             border-radius: 12px;
             text-align: center;
             font-family: 'Noto Serif TC', serif;
-            font-size: 14px;
+            font-size: 15px; /* 與資料列相同大小 */
             font-weight: 700;
             cursor: pointer;
             text-decoration: none;
             overflow: hidden;
             transition: all 0.3s ease;
             box-sizing: border-box;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         /* 金色光暈按鈕 */
         .btn-premium-gold {
@@ -1094,8 +1090,7 @@
             <div class="premium-options">
                 <a href="#" class="btn-premium btn-premium-gold" id="premium-query-btn">
                     付費查詢取得<br>
-                    <span class="premium-desktop-text" style="font-size: 12px; font-weight: 500;">(1) 112、113年度數據 &nbsp;&nbsp;(2) 112或113或114實際錄取率</span>
-                    <span class="premium-mobile-text" style="font-size: 12px; font-weight: 500; display: none;">(1) 112、113年度數據<br>(2) 112或113或114實際錄取率</span>
+                    <span style="font-size: 15px; font-weight: 500; display: inline-block; margin-top: 4px;">(1) 112、113年度數據<br>(2) 112或113或114實際錄取率</span>
                 </a>
                 <a href="#" class="btn-premium btn-premium-cyan" id="premium-terms-btn">
                     付費服務與規範說明
@@ -1109,7 +1104,8 @@
         <div class="warning-modal-content">
             <div class="warning-title">⚠️ 付款前重要提醒</div>
             <div class="warning-text">
-                請在藍新結帳畫面的最下方找到<span style="color: #ffaa00; font-weight: bold;">「留言給商店」</span>欄位，並<strong style="color: #ff4444;">務必準確填寫</strong>您想查詢的科系名稱與專屬代碼，以便系統能夠為您核發正確的報表資料。
+                請在藍新結帳畫面的最下方找到「留言給商店」欄位並點選右側鉛筆標誌，並務必準確填入您想查詢的科系名稱與專屬代碼，以便系統能夠為您核發正確的報表資料。<br>
+                <strong style="color: #ff4444;">無收集個資，請填寫收件人email即可。</strong>
                 <br>
                 <div style="text-align: center; margin-top: 15px;">
                     請複製並貼上以下資訊：<br>
@@ -1117,9 +1113,15 @@
                 </div>
             </div>
             
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 20px;">
-                <img src="https://i.imgur.com/gTrQ6Jp.png" alt="留言給商店示意圖" style="width: 100%; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);">
-                <div style="font-size: 12px; color: #888; margin-top: 8px;">示意圖：請在此欄位貼上科系資料</div>
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);">
+                <div style="background: #cfe8f4; border-radius: 4px; padding: 10px 20px; display: inline-block;">
+                    <!-- 鉛筆 icon SVG -->
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.06 3.53a2.685 2.685 0 0 0-3.8 0L3 15.79V21h5.21l12.26-12.26a2.685 2.685 0 0 0 0-3.8l-1.41-1.41ZM7.37 19H5v-2.37l10.36-10.36 2.37 2.37L7.37 19ZM16.32 5.27 15.6 6l2.37 2.37.73-.73a.685.685 0 0 0 0-.97l-1.41-1.41a.685.685 0 0 0-.97 0Z" fill="#505050"/>
+                        <rect x="5" y="19" width="14" height="2" fill="#505050" transform="translate(0, 3)"/>
+                    </svg>
+                </div>
+                <div style="font-size: 13px; color: #aaa; margin-top: 10px;">示意圖：請點選鉛筆標誌，填寫科系與接收資料的email</div>
             </div>
 
             <label class="warning-checkbox-wrapper">
