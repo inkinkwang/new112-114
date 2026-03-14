@@ -1002,7 +1002,7 @@
         <!-- 頂部標題 -->
         <div class="header-title-container">
             <div class="header-en">Historical Probability Insights</div>
-            <div class="header-zh">申請入學第二階段<br>112-114歷史錄取狀況/機率</div>
+            <div class="header-zh">申請入學第二階段<br>112-114歷史錄取數據</div>
         </div>
 
         <div style="position:relative; display:flex; flex-direction:column; align-items:center;">
@@ -1098,10 +1098,10 @@
             <div class="premium-options">
                 <a href="#" class="btn-premium btn-premium-gold" id="premium-query-btn">
                     付費查詢取得<br>
-                    <span style="font-size: 15px; font-weight: 500; display: inline-block; margin-top: 4px;">(1) 112、113年度數據<br>(2) 112或113或114實際錄取率</span>
+                    <span style="font-size: 15px; font-weight: 500; display: inline-block; margin-top: 4px;">(1) 112、113年度數據<br>(2) 112或113或114真實錄取率</span>
                 </a>
                 <a href="#" class="btn-premium btn-premium-cyan" id="premium-terms-btn">
-                    付費服務與規範說明
+                    付費服務與說明
                 </a>
             </div>
         </div>
@@ -1112,7 +1112,7 @@
         <div class="warning-modal-content">
             <div class="warning-title">⚠️ 付款前重要提醒</div>
             <div class="warning-text">
-                請在藍新結帳畫面的最下方找到「留言給商店」欄位並點選右側鉛筆標誌，填入您想查詢的科系名稱與專屬代碼，以便為您核發正確的報表資料。<br>
+                請在藍新結帳畫面的最下方找到「留言給商店」欄位並點選右側鉛筆圖示，填入您想查詢的科系名稱與專屬代碼，以便為您核發正確的數據資料。<br>
                 <strong style="color: #ff4444;">無收集個資，請填寫收件人email即可。</strong>
                 <br>
                 <div style="text-align: center; margin-top: 15px;">
@@ -1123,7 +1123,7 @@
 
             <label class="warning-checkbox-wrapper">
                 <input type="checkbox" id="terms-agree-checkbox">
-                <span>已閱讀「付費服務與規範說明」</span>
+                <span>已閱讀「付費服務與說明」</span>
             </label>
 
             <div class="warning-buttons">
@@ -1137,15 +1137,15 @@
     <div id="service-terms-modal">
         <div class="terms-modal-content">
             <button class="modal-close-btn" id="terms-close-btn" style="top: 15px; right: 15px;">&times;</button>
-            <div class="terms-title">付費服務與規範說明</div>
+            <div class="terms-title">付費服務與說明</div>
             
             <div class="terms-list">
-                <div class="terms-list-item"><span class="terms-label">服務費用：</span>『1個科系』 NT$ 100</div>
+                <div class="terms-list-item"><span class="terms-label">服務費用：</span>『1個科系』NT$100</div>
                 <div class="terms-list-item"><span class="terms-label">取得時間：</span>完成付費後，24小時內將數據發送至email</div>
-                <div class="terms-list-item"><span class="terms-label">名額限制：</span>暫定500個名額，視情況調整或關閉。</div>
-                <div class="terms-list-item"><span class="terms-label">法律聲明：</span>報告資料來源合法，過往歷史數據僅供參考，非錄取與推薦保證。</div>
-                <div class="terms-list-item"><span class="terms-label">退費相關：</span>非本系統顯示之校系，請勿送件，誤送件的退費案件會扣除 NT$20 時間處理費。如為我方無法提供數據服務之科系，將主動通知全額退費或更換校系。</div>
-                <div class="terms-list-item"><span class="terms-label">權益聲明：</span>本服務屬「依消費者要求所為之客製化給付」，不適用 7 天鑑賞期，我方保留拒絕服務、退款及對服務內容之最終解釋權，數據內容也請勿外流。</div>
+                <div class="terms-list-item"><span class="terms-label">名額限制：</span>限量名額，網站資訊與付費數據將視情況調整或關閉。</div>
+                <div class="terms-list-item"><span class="terms-label">法律聲明：</span>數據資料來源合法，惟歷史數據僅供參考，並非錄取推薦保證。</div>
+                <div class="terms-list-item"><span class="terms-label">退費相關：</span>非本系統顯示之校系，請勿送件，誤送件的退費案件將扣除 NT$20 時間處理費。如為我方無法提供數據服務之科系，將主動通知全額退費或更換校系。</div>
+                <div class="terms-list-item"><span class="terms-label">權益聲明：</span>本服務屬「依消費者要求所為之客製化給付」，不適用7天鑑賞期，我方保留拒絕服務、退款及對服務內容之最終解釋權，數據內容請勿外流。</div>
             </div>
 
             <div class="terms-buttons">
@@ -1462,7 +1462,7 @@
         warningConfirmBtn.addEventListener('click', (e) => {
             if (warningConfirmBtn.classList.contains('disabled')) {
                 e.preventDefault();
-                alert('請先勾選已閱讀「付費服務與規範說明」');
+                alert('請先勾選已閱讀「付費服務與說明」');
                 return;
             }
             warningModal.classList.remove('active');
