@@ -1412,7 +1412,9 @@
             document.getElementById('md-min-rank').textContent = data.minRank;
             document.getElementById('md-admitted').textContent = data.admitted;
             document.getElementById('md-shortfall').textContent = data.shortfall;
-            document.getElementById('md-rate').textContent = data.rate;
+            const rateVal = parseFloat(data.rate);
+            const displayRate = isNaN(rateVal) ? data.rate : (rateVal * 100).toFixed(2) + '%';
+            document.getElementById('md-rate').textContent = displayRate;
             
             // 更新瀏覽人次
             const viewCountEl = document.getElementById('md-view-count');
@@ -1521,11 +1523,6 @@
                 closeTermsModal();
             }
         });
-
-    </script>
-</body>
-</html>
-;
 
     </script>
 </body>
