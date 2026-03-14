@@ -572,7 +572,7 @@
             #subtitleBtn .btn-text { font-size: 16px !important; }
             .header-en { font-size: 14px; letter-spacing: 0.06em; }
             .header-zh { font-size: 12px; }
-            .support-email { bottom: -80px; font-size: 6px; transform: translateX(-50%) scale(0.4); transform-origin: bottom center; }
+            .support-email { bottom: -60px; font-size: 13px; transform: translateX(-50%); transform-origin: bottom center; }
 
             /* 手機版科系列表：自然換行 */
             .dept-btn {
@@ -620,11 +620,15 @@
             font-family: 'Noto Serif TC', serif;
             font-size: clamp(13px, 1.5vw, 16px);
             font-weight: 500;
-            color: #777;
+            color: #aaa;
             letter-spacing: 0.1em;
             white-space: nowrap;
+            text-decoration: none;
+            transition: color 0.2s;
         }
-
+        .support-email:hover {
+            color: #fff;
+        }
         /* ===== 科系詳細資料 Modal ===== */
         #dept-modal {
             position: fixed;
@@ -1022,7 +1026,9 @@
             </div>
 
             <!-- 客服信箱標示於此容器底部的下方 -->
-            <div class="support-email">客服信箱：<a href="mailto:inkink730424@gmail.com">inkink730424@gmail.com</a></div>
+            <!--email_off-->
+            <a href="mailto:inkink730424@gmail.com" class="support-email">客服信箱：inkink730424@gmail.com</a>
+            <!--/email_off-->
         </div>
     </section>
 
@@ -1158,45 +1164,38 @@
     <script>
         const deptDataCache = new Map();
         
-        // ========== GAS API URL（請替換成您的網址）==========
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3wT2lV9pJBnyUGPVBpQhMaIJiAIj2isG2UMkhMsfcAzNGgoexnCc-Os99yjmpS_5r/exec';
+        // Fetch sheet data on page load
+        const SHEET_ID = '1xS3LqKt6THEgQwK4Mo1KrvlFHAOPShwFfs5GrEVrTaI';
         
-        // ========== 產生 Session Token（臨時身分識別）==========
-        const sessionToken = Date.now() + '_' + Math.random().toString(36).substring(7);
-        console.log('Session Token:', sessionToken);
+        // 請將下方引號中的內容替換為您部署後產生的「網頁應用程式 URL」
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxuxni6qfwrUfV5zRZJVcd7tsFLTDpCdT1dNMopgQ4pg1GzhBFn2cDiPtaeaO-966Oc/exec';
         
-        // ========== 從 GAS API 載入所有科系資料 ==========
-        // 注意：載入資料不傳 session，避免計入查詢次數限制
-        fetch(`${GAS_URL}?action=getAllDepts`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('載入資料失敗:', data.error);
-                    // 不彈出 alert，避免阻擋頁面運作
-                    return;
-                }
+        const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        fetch(GVIZ_URL)
+            .then(res => res.text())
+            .then(text => {
+                const jsonText = text.substring(47).slice(0, -2);
+                const json = JSON.parse(jsonText);
                 
-                if (data.success && data.departments) {
-                    data.departments.forEach(dept => {
-                        deptDataCache.set(dept.code, {
-                            stage1: dept.stage1,
-                            quota: dept.quota,
-                            minStd: dept.minStd,
-                            minRank: dept.minRank,
-                            admitted: dept.admitted,
-                            shortfall: dept.shortfall,
-                            rate: dept.rate
+                if (json.table && json.table.rows) {
+                    json.table.rows.forEach(r => {
+                        if (!r.c || !r.c[1] || r.c[1].v == null) return;
+                        const code = String(r.c[1].v).padStart(6, '0');
+                        deptDataCache.set(code, {
+                            stage1: r.c[5] && r.c[5].v != null ? r.c[5].v : '-',
+                            quota: r.c[6] && r.c[6].v != null ? r.c[6].v : '-',
+                            minStd: r.c[7] && r.c[7].v != null ? r.c[7].v : '-',
+                            minRank: r.c[8] && r.c[8].v != null ? r.c[8].v : '-',
+                            admitted: r.c[9] && r.c[9].v != null ? r.c[9].v : '-',
+                            shortfall: r.c[10] && r.c[10].v != null ? r.c[10].v : '-',
+                            rate: r.c[11] ? (r.c[11].f || r.c[11].v) : '-'
                         });
                     });
-                    console.log('Sheet data loaded, total departments:', deptDataCache.size);
-                } else {
-                    console.error('資料格式錯誤');
                 }
+                console.log('Sheet data loaded, total departments:', deptDataCache.size);
             })
-            .catch(err => {
-                console.error('Data fetch error:', err);
-                // 資料載入失敗不影響主按鈕顯示
-            });
+            .catch(err => console.error('Data fetch error:', err));
 
         const video       = document.getElementById('mainVideo');
         const subtitle    = document.getElementById('subtitle');
@@ -1417,30 +1416,26 @@
             document.getElementById('md-shortfall').textContent = data.shortfall;
             document.getElementById('md-rate').textContent = data.rate;
             
-            // 更新瀏覽人次（加入 Session Token）
+            // 更新瀏覽人次
             const viewCountEl = document.getElementById('md-view-count');
-            viewCountEl.textContent = '載入中...';
-            
-            fetch(`${GAS_URL}?code=${code}&session=${sessionToken}`)
-                .then(res => res.json())
-                .then(resData => {
-                    if (resData.error) {
-                        // 顯示速率限制錯誤訊息
-                        viewCountEl.textContent = resData.error;
-                        viewCountEl.style.color = '#ff6b6b'; // 紅色
-                    } else if (resData.views) {
-                        viewCountEl.textContent = resData.views;
-                        viewCountEl.style.color = '#66b3ff'; // 恢復藍色
-                    } else {
+            if (GAS_URL && GAS_URL !== 'YOUR_WEB_APP_URL_HERE') {
+                viewCountEl.textContent = '載入中...';
+                fetch(`${GAS_URL}?code=${code}`)
+                    .then(res => res.json())
+                    .then(resData => {
+                        if (resData && resData.views) {
+                            viewCountEl.textContent = resData.views;
+                        } else {
+                            viewCountEl.textContent = '1'; // 首次查看
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Fetch view count error:', err);
                         viewCountEl.textContent = '暫無資料';
-                        viewCountEl.style.color = '#aaa';
-                    }
-                })
-                .catch(err => {
-                    console.error('Fetch view count error:', err);
-                    viewCountEl.textContent = '載入失敗';
-                    viewCountEl.style.color = '#aaa';
-                });
+                    });
+            } else {
+                viewCountEl.textContent = '（代設定）';
+            }
             
             modal.classList.add('active');
         }
@@ -1521,4 +1516,14 @@
         }
 
         termsCloseBtn.addEventListener('click', closeTermsModal);
-        termsConfirmOkBtn.addEventL
+        termsConfirmOkBtn.addEventListener('click', closeTermsModal);
+        
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) {
+                closeTermsModal();
+            }
+        });
+
+    </script>
+</body>
+</html>
