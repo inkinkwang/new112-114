@@ -1166,12 +1166,13 @@
         console.log('Session Token:', sessionToken);
         
         // ========== 從 GAS API 載入所有科系資料 ==========
-        fetch(`${GAS_URL}?action=getAllDepts&session=${sessionToken}`)
+        // 注意：載入資料不傳 session，避免計入查詢次數限制
+        fetch(`${GAS_URL}?action=getAllDepts`)
             .then(res => res.json())
             .then(data => {
                 if (data.error) {
                     console.error('載入資料失敗:', data.error);
-                    alert('載入資料失敗: ' + data.error);
+                    // 不彈出 alert，避免阻擋頁面運作
                     return;
                 }
                 
@@ -1194,7 +1195,7 @@
             })
             .catch(err => {
                 console.error('Data fetch error:', err);
-                alert('無法載入科系資料，請稍後再試');
+                // 資料載入失敗不影響主按鈕顯示
             });
 
         const video       = document.getElementById('mainVideo');
