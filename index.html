@@ -177,9 +177,13 @@
             transition: color 0.3s, text-shadow 0.3s;
         }
 
-        /* 選項按鈕放大 1.2 倍 */
-        .option-btn { padding: 22px 62px; } /* padding 放大 1.2 倍 (原 18px 52px) */
-        .option-btn .btn-text { font-size: clamp(22px, 2.6vw, 36px); } /* 字體放大 1.2 倍 (原 18px 30px) */
+        /* 選項按鈕放大 1.44 倍 (1.2 * 1.2) */
+        .option-btn { padding: 26px 74px; }
+        .option-btn .btn-text { 
+            font-size: clamp(26px, 3.1vw, 43px); 
+            line-height: 1.3;
+            white-space: normal;
+        }
 
         /* ===== 第二區：選項 ===== */
         #section-options {
@@ -208,9 +212,8 @@
         }
 
         /* 將原本的按鈕絕對定位移交給各 wrapper */
-        #wrapperA { top: 10%; right: 15%; }
-        #wrapperB { top: 22.5%; right: 27.5%; }
-        #wrapperC { top: 35%; right: 40%; }
+        #wrapperB { top: 20%; right: 25%; }
+        #wrapperC { top: 35%; right: 35%; }
 
         .main-option {
             position: relative;
@@ -507,20 +510,21 @@
                 align-items: flex-start;
                 margin-bottom: 8px;
             }
-            #wrapperA, #wrapperB, #wrapperC { transform: none; }
+            #wrapperB, #wrapperC { transform: none; }
             
             .connection-line { display: none; }
 
-            /* ABC 主選項按鈕：放大1.5倍 */
+            /* 選項按鈕再放大1.2倍 */
             .option-btn {
-                padding: 8px 21px !important;
-                border-radius: 45px !important;
+                padding: 10px 25px !important;
+                border-radius: 50px !important;
             }
             .option-btn .btn-text,
             .option-btn .btn-text * {
-                font-size: 15px !important;
+                font-size: 18px !important;
                 letter-spacing: 0.1em !important;
                 line-height: 1.3 !important;
+                white-space: normal !important;
             }
             
             /* 學校子選單：放大1.3倍 */
@@ -562,7 +566,7 @@
             #subtitleBtn .btn-text { font-size: 16px !important; }
             .header-en { font-size: 14px; letter-spacing: 0.06em; }
             .header-zh { font-size: 12px; }
-            .support-email { bottom: -80px; font-size: 6px; }
+            .support-email { bottom: -80px; font-size: 6px; transform: translateX(-50%) scale(0.4); transform-origin: bottom center; }
 
             /* 手機版科系列表：自然換行 */
             .dept-btn {
@@ -588,27 +592,7 @@
             }
         }
 
-        /* 免費觀看範例按鈕：橘色主按鈕 */
-        #wrapperA > .shimmer-btn {
-            background: rgba(255, 140, 30, 0.72);
-            border-color: rgba(255, 180, 80, 0.85);
-            box-shadow:
-                0 0 18px 4px rgba(255,160,60,0.5),
-                0 0 40px 10px rgba(255,120,30,0.2),
-                0 4px 20px rgba(0,0,0,0.08);
-        }
-        #wrapperA > .shimmer-btn .btn-text {
-            color: #fff;
-            text-shadow: 0 1px 6px rgba(180,80,0,0.4);
-        }
-        #wrapperA > .shimmer-btn:hover {
-            background: rgba(220, 100, 10, 0.88);
-            box-shadow:
-                0 0 22px 6px rgba(255,140,40,0.6),
-                0 0 50px 12px rgba(255,100,20,0.3),
-                0 4px 20px rgba(0,0,0,0.2);
-            border-color: rgba(255,200,100,0.7);
-        }
+
 
         /* 客服信箱標示 */
         .support-email {
@@ -721,6 +705,76 @@
             color: #ffb84d;
             font-weight: 700;
         }
+
+        /* ===== Modal Premium按鈕 ===== */
+        .premium-options {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255,255,255,0.15);
+        }
+        .btn-premium {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            line-height: 1.4;
+        }
+        /* 金色光暈按鈕 */
+        .btn-premium-gold {
+            background: linear-gradient(135deg, rgba(230, 160, 40, 0.8), rgba(200, 120, 20, 0.9));
+            border: 1px solid rgba(255, 200, 100, 0.8);
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            box-shadow: 0 0 15px rgba(230, 160, 40, 0.4);
+        }
+        .btn-premium-gold::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            transform: skewX(-20deg);
+            animation: premiumShimmer 3s infinite;
+        }
+        .btn-premium-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 180, 50, 0.6);
+            background: linear-gradient(135deg, rgba(250, 180, 50, 0.9), rgba(220, 140, 30, 1));
+        }
+
+        /* 青色光暈按鈕 */
+        .btn-premium-cyan {
+            background: rgba(30, 80, 120, 0.5);
+            border: 1px solid rgba(100, 200, 255, 0.5);
+            color: #b3e0ff;
+            box-shadow: 0 0 10px rgba(0, 150, 255, 0.2);
+        }
+        .btn-premium-cyan:hover {
+            transform: translateY(-2px);
+            background: rgba(40, 100, 150, 0.8);
+            color: #fff;
+            border-color: rgba(150, 220, 255, 0.8);
+            box-shadow: 0 5px 15px rgba(0, 150, 255, 0.4);
+        }
+
+        @keyframes premiumShimmer {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
     </style>
 </head>
 <body>
@@ -757,24 +811,10 @@
     <!-- 第二區：選項（點擊主按鈕後顯示） -->
     <section id="section-options">
         
-        <!-- 選項 A 模組 -->
-        <div class="option-wrapper" id="wrapperA">
-            <div class="shimmer-btn option-btn main-option" data-target="wrapperA">
-                <span class="btn-text">免費觀看範例</span>
-            </div>
-            <!-- 動態線與往下的下拉選單 -->
-            <div class="connection-line"></div>
-            <div class="sub-menu-dropdown">
-                <div class="dark-option-btn" data-school="國立臺灣大學"><span class="btn-text-dark">國立臺灣大學</span></div>
-                <div class="dark-option-btn" data-school="國立政治大學"><span class="btn-text-dark">國立政治大學</span></div>
-                <div class="dark-option-btn close-btn close-action"><span class="btn-text-dark">收合返回</span></div>
-            </div>
-        </div>
-
         <!-- 選項 B 模組 -->
         <div class="option-wrapper" id="wrapperB">
             <div class="shimmer-btn option-btn main-option" data-target="wrapperB">
-                <span class="btn-text">探索國立大學</span>
+                <span class="btn-text">探索國立大學<br>114年度第二階段錄取數據</span>
             </div>
             <div class="connection-line"></div>
             <div class="sub-menu-dropdown">
@@ -798,7 +838,7 @@
         <!-- 選項 C 模組 -->
         <div class="option-wrapper" id="wrapperC">
             <div class="shimmer-btn option-btn main-option" data-target="wrapperC">
-                <span class="btn-text">探索私立大學</span>
+                <span class="btn-text">探索私立大學<br>114年度第二階段錄取數據</span>
             </div>
             <div class="connection-line"></div>
             <div class="sub-menu-dropdown">
@@ -835,6 +875,16 @@
                 <div class="data-row"><span class="data-label">分發錄取人數</span><span class="data-value" id="md-admitted">-</span></div>
                 <div class="data-row"><span class="data-label">缺額人數</span><span class="data-value" id="md-shortfall">-</span></div>
                 <div class="data-row"><span class="data-label">最後假定錄取率</span><span class="data-value highlight-value" id="md-rate">-</span></div>
+            </div>
+            
+            <div class="premium-options">
+                <a href="#" class="btn-premium btn-premium-gold" id="premium-query-btn">
+                    付費查詢取得<br>
+                    <span style="font-size: 12px; font-weight: 500;">(1) 112、113年度數據 &nbsp;&nbsp;(2) 112或113或114實際錄取率</span>
+                </a>
+                <a href="#" class="btn-premium btn-premium-cyan" id="premium-terms-btn">
+                    付費服務與規範說明
+                </a>
             </div>
         </div>
     </div>
