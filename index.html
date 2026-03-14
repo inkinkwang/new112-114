@@ -347,17 +347,28 @@
 
         /* ===== 科系展開面板 ===== */
         #dept-panel {
-            display: none;
             position: absolute;
             left: 2vw;
             top: 8vh;
             width: 96vw;
             z-index: 20;
+            display: flex;
             flex-direction: column;
             align-items: flex-start;
             gap: 0;
+            /* 動畫屬性：預設隱藏且往下偏移 */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-20px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
         }
-        #dept-panel.show { display: flex; }
+        #dept-panel.show { 
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
 
         #dept-school-title {
             font-family: 'Noto Serif TC', serif;
@@ -612,6 +623,104 @@
             letter-spacing: 0.1em;
             white-space: nowrap;
         }
+
+        /* ===== 科系詳細資料 Modal ===== */
+        #dept-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s;
+        }
+        #dept-modal.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .dept-modal-content {
+            background: rgba(35, 30, 45, 0.95);
+            border: 1px solid rgba(150, 130, 200, 0.5);
+            border-radius: 24px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(120,80,255,0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Noto Serif TC', serif;
+            color: #eee;
+            position: relative;
+        }
+        #dept-modal.active .dept-modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 28px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: color 0.2s, background 0.2s;
+        }
+        .modal-close-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        .dept-modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+        .dept-modal-data {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+        .data-label {
+            font-size: 14px;
+            color: #ccc;
+        }
+        .data-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #fff;
+            text-align: right;
+        }
+        .highlight-value {
+            color: #ffb84d;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -713,7 +822,55 @@
 
     </section>
 
+    <!-- 科系詳細資料 Modal -->
+    <div id="dept-modal">
+        <div class="dept-modal-content">
+            <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+            <div class="dept-modal-title" id="modal-dept-name">科系名稱</div>
+            <div class="dept-modal-data">
+                <div class="data-row"><span class="data-label">篩選通過第一階段人數</span><span class="data-value" id="md-stage1">-</span></div>
+                <div class="data-row"><span class="data-label">招生名額</span><span class="data-value" id="md-quota">-</span></div>
+                <div class="data-row"><span class="data-label">分發最低標準</span><span class="data-value highlight-value" id="md-min-std">-</span></div>
+                <div class="data-row"><span class="data-label">分發最低標準名次</span><span class="data-value" id="md-min-rank">-</span></div>
+                <div class="data-row"><span class="data-label">分發錄取人數</span><span class="data-value" id="md-admitted">-</span></div>
+                <div class="data-row"><span class="data-label">缺額人數</span><span class="data-value" id="md-shortfall">-</span></div>
+                <div class="data-row"><span class="data-label">最後假定錄取率</span><span class="data-value highlight-value" id="md-rate">-</span></div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const deptDataCache = new Map();
+        
+        // Fetch sheet data on page load
+        const SHEET_ID = '1xS3LqKt6THEgQwK4Mo1KrvlFHAOPShwFfs5GrEVrTaI';
+        const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        fetch(GVIZ_URL)
+            .then(res => res.text())
+            .then(text => {
+                const jsonText = text.substring(47).slice(0, -2);
+                const json = JSON.parse(jsonText);
+                
+                if (json.table && json.table.rows) {
+                    json.table.rows.forEach(r => {
+                        if (!r.c || !r.c[1] || r.c[1].v == null) return;
+                        const code = String(r.c[1].v).padStart(6, '0');
+                        deptDataCache.set(code, {
+                            stage1: r.c[5] && r.c[5].v != null ? r.c[5].v : '-',
+                            quota: r.c[6] && r.c[6].v != null ? r.c[6].v : '-',
+                            minStd: r.c[7] && r.c[7].v != null ? r.c[7].v : '-',
+                            minRank: r.c[8] && r.c[8].v != null ? r.c[8].v : '-',
+                            admitted: r.c[9] && r.c[9].v != null ? r.c[9].v : '-',
+                            shortfall: r.c[10] && r.c[10].v != null ? r.c[10].v : '-',
+                            rate: r.c[11] ? (r.c[11].f || r.c[11].v) : '-'
+                        });
+                    });
+                }
+                console.log('Sheet data loaded, total departments:', deptDataCache.size);
+            })
+            .catch(err => console.error('Data fetch error:', err));
+
         const video       = document.getElementById('mainVideo');
         const subtitle    = document.getElementById('subtitle');
         const subtitleBtn = document.getElementById('subtitleBtn');
@@ -850,6 +1007,12 @@
                     const b = document.createElement('div');
                     b.className = 'dept-btn';
                     b.innerHTML = `<span class="dept-code">${code}</span><span class="dept-name">${name}</span>`;
+                    
+                    b.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showDeptModal(code, name);
+                    });
+                    
                     deptList.appendChild(b);
                 });
             }
@@ -902,6 +1065,40 @@
                 e.stopPropagation();
                 resetMenu();
             });
+        });
+
+        // ===== Modal Logic =====
+        const modal = document.getElementById('dept-modal');
+        const modalCloseBtnInner = document.getElementById('modal-close-btn');
+
+        function showDeptModal(code, name) {
+            document.getElementById('modal-dept-name').textContent = name;
+            
+            const data = deptDataCache.get(code) || {
+                stage1: '無資料', quota: '無資料', minStd: '無資料', minRank: '無資料', admitted: '無資料', shortfall: '無資料', rate: '無資料'
+            };
+            
+            document.getElementById('md-stage1').textContent = data.stage1;
+            document.getElementById('md-quota').textContent = data.quota;
+            document.getElementById('md-min-std').textContent = data.minStd;
+            document.getElementById('md-min-rank').textContent = data.minRank;
+            document.getElementById('md-admitted').textContent = data.admitted;
+            document.getElementById('md-shortfall').textContent = data.shortfall;
+            document.getElementById('md-rate').textContent = data.rate;
+            
+            modal.classList.add('active');
+        }
+
+        function closeDeptModal() {
+            modal.classList.remove('active');
+        }
+
+        modalCloseBtnInner.addEventListener('click', closeDeptModal);
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeDeptModal();
+            }
         });
 
     </script>
