@@ -1093,6 +1093,7 @@
                 <div class="data-row"><span class="data-label">分發錄取人數</span><span class="data-value" id="md-admitted">-</span></div>
                 <div class="data-row"><span class="data-label">缺額人數</span><span class="data-value" id="md-shortfall">-</span></div>
                 <div class="data-row"><span class="data-label">最後假定錄取率</span><span class="data-value highlight-value" id="md-rate">-</span></div>
+                <div class="data-row"><span class="data-label">累計瀏覽人次</span><span class="data-value" id="md-view-count" style="color: #66b3ff;">載入中...</span></div>
             </div>
             
             <div class="premium-options">
@@ -1142,7 +1143,7 @@
             <div class="terms-list">
                 <div class="terms-list-item"><span class="terms-label">服務費用：</span>『1個科系』NT$100</div>
                 <div class="terms-list-item"><span class="terms-label">取得時間：</span>完成付費後，24小時內將數據發送至email</div>
-                <div class="terms-list-item"><span class="terms-label">名額限制：</span>限量名額，網站資訊與付費數據將視情況調整或關閉。</div>
+                <div class="terms-list-item"><span class="terms-label">名額限制：</span>付費數據會限定付費索取次數，網站免費資訊視情況可能關閉。</div>
                 <div class="terms-list-item"><span class="terms-label">法律聲明：</span>數據資料來源合法，惟歷史數據僅供參考，並非錄取推薦保證。</div>
                 <div class="terms-list-item"><span class="terms-label">退費相關：</span>非本系統顯示之校系，請勿送件，誤送件的退費案件將扣除 NT$20 時間處理費。如為我方無法提供數據服務之科系，將主動通知全額退費或更換校系。</div>
                 <div class="terms-list-item"><span class="terms-label">權益聲明：</span>本服務屬「依消費者要求所為之客製化給付」，不適用7天鑑賞期，我方保留拒絕服務、退款及對服務內容之最終解釋權，數據內容請勿外流。</div>
@@ -1159,6 +1160,10 @@
         
         // Fetch sheet data on page load
         const SHEET_ID = '1xS3LqKt6THEgQwK4Mo1KrvlFHAOPShwFfs5GrEVrTaI';
+        
+        // 請將下方引號中的內容替換為您部署後產生的「網頁應用程式 URL」
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxuxni6qfwrUfV5zRZJVcd7tsFLTDpCdT1dNMopgQ4pg1GzhBFn2cDiPtaeaO-966Oc/exec';
+        
         const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
         fetch(GVIZ_URL)
@@ -1404,6 +1409,27 @@
             document.getElementById('md-admitted').textContent = data.admitted;
             document.getElementById('md-shortfall').textContent = data.shortfall;
             document.getElementById('md-rate').textContent = data.rate;
+            
+            // 更新瀏覽人次
+            const viewCountEl = document.getElementById('md-view-count');
+            if (GAS_URL && GAS_URL !== 'YOUR_WEB_APP_URL_HERE') {
+                viewCountEl.textContent = '載入中...';
+                fetch(`${GAS_URL}?code=${code}`)
+                    .then(res => res.json())
+                    .then(resData => {
+                        if (resData && resData.views) {
+                            viewCountEl.textContent = resData.views;
+                        } else {
+                            viewCountEl.textContent = '1'; // 首次查看
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Fetch view count error:', err);
+                        viewCountEl.textContent = '暫無資料';
+                    });
+            } else {
+                viewCountEl.textContent = '（代設定）';
+            }
             
             modal.classList.add('active');
         }
