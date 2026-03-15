@@ -15,7 +15,7 @@
 
         body {
             background: #ffffff;
-            font-family: 'Helvetica Neue', Helvetica, Arial, 'Microsoft JhengHei', sans-serif;
+            font-family: 'Noto Serif TC', serif, 'Microsoft JhengHei', sans-serif;
             overflow-x: hidden;
         }
 
@@ -1164,34 +1164,36 @@
     <script>
         const deptDataCache = new Map();
         
-        // GAS API URL
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbznadYrjReCAP0i1dIcVyq_ezCYc8tVSo8m5sb5RlagVngbEg3BpQyUzNomam1GDmzf/exec';
+        // Fetch sheet data on page load
+        const SHEET_ID = '1xS3LqKt6THEgQwK4Mo1KrvlFHAOPShwFfs5GrEVrTaI';
         
-        // 從 GAS API 載入所有科系資料
-        fetch(`${GAS_URL}?action=getAllDepts`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('載入資料失敗:', data.error);
-                    return;
-                }
+        // 請將下方引號中的內容替換為您部署後產生的「網頁應用程式 URL」
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxuxni6qfwrUfV5zRZJVcd7tsFLTDpCdT1dNMopgQ4pg1GzhBFn2cDiPtaeaO-966Oc/exec';
+        
+        const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+        fetch(GVIZ_URL)
+            .then(res => res.text())
+            .then(text => {
+                const jsonText = text.substring(47).slice(0, -2);
+                const json = JSON.parse(jsonText);
                 
-                if (data.success && data.departments) {
-                    data.departments.forEach(dept => {
-                        deptDataCache.set(dept.code, {
-                            stage1: dept.stage1,
-                            quota: dept.quota,
-                            minStd: dept.minStd,
-                            minRank: dept.minRank,
-                            admitted: dept.admitted,
-                            shortfall: dept.shortfall,
-                            rate: dept.rate
+                if (json.table && json.table.rows) {
+                    json.table.rows.forEach(r => {
+                        if (!r.c || !r.c[1] || r.c[1].v == null) return;
+                        const code = String(r.c[1].v).padStart(6, '0');
+                        deptDataCache.set(code, {
+                            stage1: r.c[5] && r.c[5].v != null ? r.c[5].v : '-',
+                            quota: r.c[6] && r.c[6].v != null ? r.c[6].v : '-',
+                            minStd: r.c[7] && r.c[7].v != null ? r.c[7].v : '-',
+                            minRank: r.c[8] && r.c[8].v != null ? r.c[8].v : '-',
+                            admitted: r.c[9] && r.c[9].v != null ? r.c[9].v : '-',
+                            shortfall: r.c[10] && r.c[10].v != null ? r.c[10].v : '-',
+                            rate: r.c[11] ? (r.c[11].f || r.c[11].v) : '-'
                         });
                     });
-                    console.log('Sheet data loaded, total departments:', deptDataCache.size);
-                } else {
-                    console.error('資料格式錯誤');
                 }
+                console.log('Sheet data loaded, total departments:', deptDataCache.size);
             })
             .catch(err => console.error('Data fetch error:', err));
 
@@ -1412,9 +1414,7 @@
             document.getElementById('md-min-rank').textContent = data.minRank;
             document.getElementById('md-admitted').textContent = data.admitted;
             document.getElementById('md-shortfall').textContent = data.shortfall;
-            const rateVal = parseFloat(data.rate);
-            const displayRate = isNaN(rateVal) ? data.rate : (rateVal * 100).toFixed(2) + '%';
-            document.getElementById('md-rate').textContent = displayRate;
+            document.getElementById('md-rate').textContent = data.rate;
             
             // 更新瀏覽人次
             const viewCountEl = document.getElementById('md-view-count');
@@ -1523,6 +1523,11 @@
                 closeTermsModal();
             }
         });
+
+    </script>
+</body>
+</html>
+;
 
     </script>
 </body>
