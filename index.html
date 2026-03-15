@@ -15,7 +15,7 @@
 
         body {
             background: #ffffff;
-            font-family: 'Noto Serif TC', serif, 'Microsoft JhengHei', sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, 'Microsoft JhengHei', sans-serif;
             overflow-x: hidden;
         }
 
@@ -431,7 +431,7 @@
         .dept-btn .dept-name {
             font-size: clamp(11px, 1.1vw, 13px);
             letter-spacing: 0.04em;
-            color: #ffcc00; /* 更換為凸顯的琥珀色 */
+            color: #eee;
             line-height: 1.4;
             white-space: normal;
             word-break: break-all;
@@ -692,7 +692,7 @@
         .dept-modal-title {
             font-size: 22px;
             font-weight: 700;
-            color: #ffcc00; /* 與列表一致的琥珀色 */
+            color: #fff;
             margin-bottom: 20px;
             text-align: center;
             letter-spacing: 0.1em;
@@ -1148,9 +1148,9 @@
             
             <div class="terms-list">
                 <div class="terms-list-item"><span class="terms-label">服務費用：</span>『1個科系』NT$100</div>
-                <div class="terms-list-item"><span class="terms-label">取得時間：</span>完成付費後，24小時內將資料發送至email</div>
-                <div class="terms-list-item"><span class="terms-label">名額限制：</span>每個科系付費索取數據次數，超過招生名額即關閉，本網站依據瀏覽狀況可能關閉。</div>
-                <div class="terms-list-item"><span class="terms-label">法律聲明：</span>數據資料來源合法，惟歷史數據僅供參考，並非未來錄取與推薦保證。</div>
+                <div class="terms-list-item"><span class="terms-label">取得時間：</span>完成付費後，24小時內將數據發送至email</div>
+                <div class="terms-list-item"><span class="terms-label">名額限制：</span>付費數據會限定付費索取次數，網站免費資訊視情況可能關閉。</div>
+                <div class="terms-list-item"><span class="terms-label">法律聲明：</span>數據資料來源合法，惟歷史數據僅供參考，並非錄取推薦保證。</div>
                 <div class="terms-list-item"><span class="terms-label">退費相關：</span>非本系統顯示之校系，請勿送件，誤送件的退費案件將扣除 NT$20 時間處理費。如為我方無法提供數據服務之科系，將主動通知全額退費或更換校系。</div>
                 <div class="terms-list-item"><span class="terms-label">權益聲明：</span>本服務屬「依消費者要求所為之客製化給付」，不適用7天鑑賞期，我方保留拒絕服務、退款及對服務內容之最終解釋權，數據內容請勿外流。</div>
             </div>
@@ -1164,36 +1164,34 @@
     <script>
         const deptDataCache = new Map();
         
-        // Fetch sheet data on page load
-        const SHEET_ID = '1xS3LqKt6THEgQwK4Mo1KrvlFHAOPShwFfs5GrEVrTaI';
+        // GAS API URL
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbznadYrjReCAP0i1dIcVyq_ezCYc8tVSo8m5sb5RlagVngbEg3BpQyUzNomam1GDmzf/exec';
         
-        // 請將下方引號中的內容替換為您部署後產生的「網頁應用程式 URL」
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxuxni6qfwrUfV5zRZJVcd7tsFLTDpCdT1dNMopgQ4pg1GzhBFn2cDiPtaeaO-966Oc/exec';
-        
-        const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-
-        fetch(GVIZ_URL)
-            .then(res => res.text())
-            .then(text => {
-                const jsonText = text.substring(47).slice(0, -2);
-                const json = JSON.parse(jsonText);
+        // 從 GAS API 載入所有科系資料
+        fetch(`${GAS_URL}?action=getAllDepts`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('載入資料失敗:', data.error);
+                    return;
+                }
                 
-                if (json.table && json.table.rows) {
-                    json.table.rows.forEach(r => {
-                        if (!r.c || !r.c[1] || r.c[1].v == null) return;
-                        const code = String(r.c[1].v).padStart(6, '0');
-                        deptDataCache.set(code, {
-                            stage1: r.c[5] && r.c[5].v != null ? r.c[5].v : '-',
-                            quota: r.c[6] && r.c[6].v != null ? r.c[6].v : '-',
-                            minStd: r.c[7] && r.c[7].v != null ? r.c[7].v : '-',
-                            minRank: r.c[8] && r.c[8].v != null ? r.c[8].v : '-',
-                            admitted: r.c[9] && r.c[9].v != null ? r.c[9].v : '-',
-                            shortfall: r.c[10] && r.c[10].v != null ? r.c[10].v : '-',
-                            rate: r.c[11] ? (r.c[11].f || r.c[11].v) : '-'
+                if (data.success && data.departments) {
+                    data.departments.forEach(dept => {
+                        deptDataCache.set(dept.code, {
+                            stage1: dept.stage1,
+                            quota: dept.quota,
+                            minStd: dept.minStd,
+                            minRank: dept.minRank,
+                            admitted: dept.admitted,
+                            shortfall: dept.shortfall,
+                            rate: dept.rate
                         });
                     });
+                    console.log('Sheet data loaded, total departments:', deptDataCache.size);
+                } else {
+                    console.error('資料格式錯誤');
                 }
-                console.log('Sheet data loaded, total departments:', deptDataCache.size);
             })
             .catch(err => console.error('Data fetch error:', err));
 
@@ -1414,7 +1412,9 @@
             document.getElementById('md-min-rank').textContent = data.minRank;
             document.getElementById('md-admitted').textContent = data.admitted;
             document.getElementById('md-shortfall').textContent = data.shortfall;
-            document.getElementById('md-rate').textContent = data.rate;
+            const rateVal = parseFloat(data.rate);
+            const displayRate = isNaN(rateVal) ? data.rate : (rateVal * 100).toFixed(2) + '%';
+            document.getElementById('md-rate').textContent = displayRate;
             
             // 更新瀏覽人次
             const viewCountEl = document.getElementById('md-view-count');
@@ -1523,11 +1523,6 @@
                 closeTermsModal();
             }
         });
-
-    </script>
-</body>
-</html>
-;
 
     </script>
 </body>
